@@ -35,6 +35,10 @@ import {
   ToggleLeft,
   ToggleRight,
   Calendar,
+  Pencil,
+  Trash2,
+  FileDown,
+  AlertTriangle,
 } from "lucide-react"
 import { cn, formatDate, formatPercent } from "@/lib/utils"
 
@@ -142,6 +146,10 @@ export default function AdminPage() {
   const [staffFormError, setStaffFormError] = useState("")
   const [staffFormSuccess, setStaffFormSuccess] = useState("")
   const [staffSearch, setStaffSearch] = useState("")
+
+  // ── Edit / Delete ──
+  const [editStaff, setEditStaff] = useState<Staff | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
 
   // ── Loading ──
   const [loading, setLoading] = useState(true)
@@ -295,6 +303,79 @@ export default function AdminPage() {
     } catch {
       // silent
     }
+  }
+
+  // ── Edit Staff ──
+  const handleEditStaff = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editStaff) return
+    try {
+      const body: Record<string, unknown> = {
+        name: editStaff.name,
+        nip: editStaff.nip,
+        phone: editStaff.phone || undefined,
+        email: editStaff.email || undefined,
+        branchId: Number(editStaff.branchId),
+        roleId: Number(editStaff.roleId),
+        joinDate: editStaff.joinDate || undefined,
+        isActive: editStaff.isActive,
+      }
+      const res = await fetch(`/api/staff/${editStaff.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...authHeader() },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) {
+        const d = await res.json()
+        alert(d.error || "Gagal update")
+        return
+      }
+      setEditStaff(null)
+      loadStaffList()
+    } catch {
+      alert("Gagal terhubung ke server")
+    }
+  }
+
+  // ── Delete Staff ──
+  const handleDeleteStaff = async (id: number) => {
+    try {
+      const res = await fetch(`/api/staff/${id}`, {
+        method: "DELETE",
+        headers: authHeader(),
+      })
+      if (!res.ok) {
+        const d = await res.json()
+        alert(d.error || "Gagal hapus")
+        return
+      }
+      setDeleteConfirm(null)
+      loadStaffList()
+    } catch {
+      alert("Gagal terhubung ke server")
+    }
+  }
+
+  // ── Export CSV ──
+  const exportCsv = () => {
+    const headers = ["NIP", "Nama", "Phone", "Email", "Cabang", "Peran", "Status", "Join Date"]
+    const csvRows = [headers.join(",")]
+    staffList.forEach((s) => {
+      const row = [
+        s.nip, s.name, s.phone || "", s.email || "",
+        s.branch?.name || "", s.role?.name || "",
+        s.isActive ? "Aktif" : "Nonaktif", s.joinDate || "",
+      ].map((v) => `"${String(v).replace(/"/g, '""')}"`)
+      csvRows.push(row.join(","))
+    })
+    const csv = "\uFEFF" + csvRows.join("\n")
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "staff_export_" + new Date().toISOString().slice(0, 10) + ".csv"
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   // ── Approve KPI ──
@@ -787,13 +868,23 @@ export default function AdminPage() {
                   <Users className="w-4 h-4 text-[#C9A96E]" />
                   <h3 className="text-sm font-semibold text-white">Manajemen Staff</h3>
                 </div>
-                <button
-                  onClick={() => setShowStaffForm(!showStaffForm)}
-                  className="btn-primary text-sm flex items-center gap-1.5"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  Tambah Staff
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={exportCsv}
+                    className="btn-secondary text-sm flex items-center gap-1.5"
+                    title="Export CSV"
+                  >
+                    <FileDown className="w-3.5 h-3.5" />
+                    Export CSV
+                  </button>
+                  <button
+                    onClick={() => setShowStaffForm(!showStaffForm)}
+                    className="btn-primary text-sm flex items-center gap-1.5"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    Tambah Staff
+                  </button>
+                </div>
               </div>
 
               {/* Create Staff Form */}
@@ -1001,10 +1092,25 @@ export default function AdminPage() {
                               </span>
                             </td>
                             <td className="py-3 text-right">
+                              <div className="flex items-center gap-1 justify-end">
+                              <button
+                                onClick={() => setEditStaff(s)}
+                                className="text-xs text-[#C9A96E] hover:text-white hover:bg-[#C9A96E]/15 transition-colors px-2 py-1 rounded-lg"
+                                title="Edit Staff"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirm(s.id)}
+                                className="text-xs text-[#E2A6C0] hover:text-white hover:bg-[#731D36]/20 transition-colors px-2 py-1 rounded-lg"
+                                title="Hapus Staff"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                               <button
                                 onClick={() => toggleStaffActive(s)}
                                 className={cn(
-                                  "text-xs flex items-center gap-1 ml-auto transition-colors px-2.5 py-1 rounded-lg",
+                                  "text-xs flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg",
                                   s.isActive
                                     ? "text-[#E2A6C0] hover:text-white hover:bg-[#731D36]/20"
                                     : "text-[#C9A96E] hover:text-white hover:bg-[#C9A96E]/15"
@@ -1016,6 +1122,7 @@ export default function AdminPage() {
                                   <><CheckCircle className="w-3.5 h-3.5" /> Aktifkan</>
                                 )}
                               </button>
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -1029,6 +1136,135 @@ export default function AdminPage() {
               )}
             </div>
           </>
+        )}
+
+        {/* ── Edit Staff Modal ── */}
+        {editStaff && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setEditStaff(null)}>
+            <div className="card max-w-lg w-full p-6 relative" onClick={(e) => e.stopPropagation()}>
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A96E] to-transparent opacity-50" />
+              <div className="flex items-center gap-2 mb-4">
+                <Pencil className="w-4 h-4 text-[#C9A96E]" />
+                <h3 className="text-sm font-semibold text-white">Edit Staff</h3>
+              </div>
+              <form onSubmit={handleEditStaff} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-gray-400">NIP *</label>
+                    <input
+                      value={editStaff.nip}
+                      onChange={(e) => setEditStaff({ ...editStaff, nip: e.target.value })}
+                      className="input-field text-sm"
+                      placeholder="NIP"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-gray-400">Nama *</label>
+                    <input
+                      value={editStaff.name}
+                      onChange={(e) => setEditStaff({ ...editStaff, name: e.target.value })}
+                      className="input-field text-sm"
+                      placeholder="Nama Lengkap"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-gray-400">Phone</label>
+                    <input
+                      value={editStaff.phone || ""}
+                      onChange={(e) => setEditStaff({ ...editStaff, phone: e.target.value })}
+                      className="input-field text-sm"
+                      placeholder="Phone"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-gray-400">Email</label>
+                    <input
+                      value={editStaff.email || ""}
+                      onChange={(e) => setEditStaff({ ...editStaff, email: e.target.value })}
+                      className="input-field text-sm"
+                      placeholder="email@example.com"
+                      type="email"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-gray-400">Cabang *</label>
+                    <select
+                      value={editStaff.branchId}
+                      onChange={(e) => setEditStaff({ ...editStaff, branchId: Number(e.target.value) })}
+                      className="select-field text-sm"
+                    >
+                      <option value="">Pilih Cabang</option>
+                      {branches.map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-gray-400">Peran *</label>
+                    <select
+                      value={editStaff.roleId}
+                      onChange={(e) => setEditStaff({ ...editStaff, roleId: Number(e.target.value) })}
+                      className="select-field text-sm"
+                    >
+                      <option value="">Pilih Peran</option>
+                      {roles.map((r) => (
+                        <option key={r.id} value={r.id}>{r.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-gray-400">Join Date</label>
+                    <input
+                      value={editStaff.joinDate || ""}
+                      onChange={(e) => setEditStaff({ ...editStaff, joinDate: e.target.value })}
+                      className="input-field text-sm"
+                      type="date"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editStaff.isActive}
+                      onChange={(e) => setEditStaff({ ...editStaff, isActive: e.target.checked })}
+                      className="w-4 h-4 rounded border-gray-600 bg-white/5 text-[#C9A96E] focus:ring-[#C9A96E] focus:ring-offset-0"
+                    />
+                    <span className="text-xs text-gray-400">Status Aktif</span>
+                  </label>
+                </div>
+                <div className="flex gap-3 justify-end">
+                  <button type="button" onClick={() => setEditStaff(null)} className="btn-secondary text-sm">Batal</button>
+                  <button type="submit" className="btn-primary text-sm">Simpan Perubahan</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── Delete Confirmation ── */}
+        {deleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirm(null)}>
+            <div className="card max-w-sm w-full p-6 relative text-center" onClick={(e) => e.stopPropagation()}>
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#731D36] to-transparent opacity-50" />
+              <div className="flex justify-center mb-3">
+                <div className="w-12 h-12 rounded-full bg-[#731D36]/20 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-[#E2A6C0]" />
+                </div>
+              </div>
+              <h3 className="text-sm font-semibold text-white mb-2">Hapus Staff?</h3>
+              <p className="text-xs text-gray-400 mb-6">
+                Staff akan dihapus permanen beserta semua data KPI-nya. Tindakan ini tidak bisa dibatalkan.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button type="button" onClick={() => setDeleteConfirm(null)} className="btn-secondary text-sm">Batal</button>
+                <button type="button" onClick={() => handleDeleteStaff(deleteConfirm)} className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-[#731D36] to-[#8B2A45] hover:from-[#8B2A45] hover:to-[#731D36] transition-all duration-300 flex items-center gap-1.5">
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Ya, Hapus
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* ════════════════════════════════════════════ */}
