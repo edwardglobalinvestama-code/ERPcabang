@@ -1,19 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
+
+// Helper: require authentication via session header
+function getAuthStaff(request: NextRequest): { staffId: number; roleSlug: string } | null {
+  try {
+    const auth = request.headers.get('x-auth-staff')
+    if (!auth) return null
+    return JSON.parse(Buffer.from(auth, 'base64').toString())
+  } catch {
+    return null
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = getAuthStaff(request)
+    if (!auth) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(request.url)
     const branchId = searchParams.get('branchId')
     const roleId = searchParams.get('roleId')
+    // Only BM can see all staff; others see their own branch only
+    const isBM = auth.roleSlug === 'branch-manager'
 
     const where: Record<string, unknown> = {}
     if (branchId) where.branchId = Number(branchId)
+    else if (!isBM) {
+      // Non-BM can only see their own branch
+      const staff = await prisma.staff.findUnique({ where: { id: auth.staffId }, select: { branchId: true } })
+      if (staff) where.branchId = staff.branchId
+    }
     if (roleId) where.roleId = Number(roleId)
 
     const staff = await prisma.staff.findMany({
       where,
-      include: {
+      select: {
+        id: true, nip: true, name: true, phone: true, email: true,
+        isActive: true, branchId: true, roleId: true, joinDate: true,
+        createdAt: true, updatedAt: true,
+        // ⛔ pin is intentionally excluded
         branch: { select: { id: true, name: true, code: true } },
         role: { select: { id: true, name: true, slug: true } },
       },
@@ -32,6 +60,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = getAuthStaff(request)
+    if (!auth || auth.roleSlug !== 'branch-manager') {
+      return NextResponse.json({ error: 'Forbidden — only Branch Manager can create staff' }, { status: 403 })
+    }
+
     const body = await request.json()
     const { nip, name, phone, email, pin, branchId, roleId, joinDate } = body
 
@@ -51,18 +84,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 🔐 Hash PIN sebelum disimpan
+    const hashedPin = await bcrypt.hash(pin, 10)
+
     const staff = await prisma.staff.create({
       data: {
         nip,
         name,
         phone: phone ?? null,
         email: email ?? null,
-        pin,
+        pin: hashedPin,
         branchId: Number(branchId),
         roleId: Number(roleId),
         joinDate: joinDate ? new Date(joinDate) : null,
       },
-      include: {
+      select: {
+        id: true, nip: true, name: true, phone: true, email: true,
+        isActive: true, branchId: true, roleId: true, joinDate: true,
+        createdAt: true, updatedAt: true,
         branch: { select: { id: true, name: true, code: true } },
         role: { select: { id: true, name: true, slug: true } },
       },
