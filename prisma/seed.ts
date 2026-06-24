@@ -32,6 +32,7 @@ async function main() {
     prisma.branch.create({ data: { name: 'Inusa Balikpapan', code: 'BPN', address: 'Jl. MT Haryono No. 5', city: 'Balikpapan', phone: '0542-123456' } }),
     prisma.branch.create({ data: { name: 'Inusa Lombok', code: 'LMB', address: 'Jl. Pejanggik No. 2', city: 'Lombok', phone: '0370-123456' } }),
     prisma.branch.create({ data: { name: 'Inusa Batam', code: 'BTM', address: 'Jl. Nagoya No. 50', city: 'Batam', phone: '0778-123456' } }),
+    prisma.branch.create({ data: { name: 'Vanderlab Athletic Recovery', code: 'VDR', address: 'Jl. Gym No. 1', city: 'Malang', phone: '0341-999999' } }),
   ])
   console.log(`  ✓ Created ${branches.length} branches`)
 
@@ -44,6 +45,7 @@ async function main() {
     prisma.role.create({ data: { name: 'Customer Service', slug: 'cs', description: 'Customer service' } }),
     prisma.role.create({ data: { name: 'Apoteker', slug: 'apoteker', description: 'Apoteker' } }),
     prisma.role.create({ data: { name: 'Gudang', slug: 'gudang', description: 'Staff gudang & logistik' } }),
+    prisma.role.create({ data: { name: 'Coach', slug: 'coach', description: 'Personal trainer & gym staff' } }),
   ])
   console.log(`  ✓ Created ${roles.length} roles`)
 
@@ -124,6 +126,22 @@ async function main() {
   }
   console.log(`  ✓ Created ${categories.length} KPI categories`)
 
+  // ── Vanderlab Gym KPI Categories ──
+  const vanderlabCategoriesData = [
+    { name: 'Jumlah Member Aktif', slug: 'jumlah-member-aktif', weight: 2, description: 'Target jumlah member aktif bulan ini' },
+    { name: 'Retensi Member', slug: 'retensi-member', weight: 2, description: 'Persentase member yang renew membership' },
+    { name: 'Sesi Personal Training', slug: 'sesi-personal-training', weight: 1.5, description: 'Jumlah sesi PT yang terjual' },
+    { name: 'Kebersihan & Perawatan Alat', slug: 'kebersihan-alat-gym', weight: 1.5, description: 'Skor kebersihan & perawatan alat gym' },
+    { name: 'Kepuasan Member', slug: 'kepuasan-member', weight: 1.5, description: 'Survey kepuasan member' },
+    { name: 'Akuisisi Member Baru', slug: 'akuisisi-member-baru', weight: 2, description: 'Jumlah member baru per bulan' },
+    { name: 'Target Revenue', slug: 'target-revenue-gym', weight: 2.5, description: 'Target pendapatan gym' },
+    { name: 'Upselling Paket', slug: 'upselling-paket-gym', weight: 1, description: 'Penjualan paket tambahan & suplemen' },
+  ]
+  const vanderlabCategories = await Promise.all(
+    vanderlabCategoriesData.map(c => prisma.kpiCategory.create({ data: c }))
+  )
+  console.log(`  ✓ Created ${vanderlabCategories.length} Vanderlab gym KPI categories`)
+
   // ── 4. KPI Targets ──
   const catRoleMap = new Map<string, number[]>()
   const targetValues: Record<string, Record<string, number>> = {
@@ -191,6 +209,20 @@ async function main() {
     staffCount++
   }
   console.log(`  ✓ Created ${staffCount} staff members`)
+
+  // ── Vanderlab Staff ──
+  const vanderlabBranch = branches[14]
+  const coachRole = roles[7]
+  const vanderlabStaffData = [
+    { nip: 'STF-VDR-BM-001', name: 'Rizky Pratama', pin: pinHash, branchId: vanderlabBranch.id, roleId: coachRole.id, phone: '08123456780', email: 'rizky.pratama@vanderlab.id', isActive: true, joinDate: new Date('2026-06-01') },
+    { nip: 'STF-VDR-CCH-001', name: 'Ahmad Fauzi', pin: pinHash, branchId: vanderlabBranch.id, roleId: coachRole.id, phone: '08123456781', email: 'ahmad.fauzi@vanderlab.id', isActive: true, joinDate: new Date('2026-06-01') },
+    { nip: 'STF-VDR-CCH-002', name: 'Dian Permata', pin: pinHash, branchId: vanderlabBranch.id, roleId: coachRole.id, phone: '08123456782', email: 'dian.permata@vanderlab.id', isActive: true, joinDate: new Date('2026-06-01') },
+  ]
+  for (const s of vanderlabStaffData) {
+    await prisma.staff.create({ data: s })
+    staffCount++
+  }
+  console.log(`  ✓ Added ${vanderlabStaffData.length} Vanderlab staff members`)
 
   // ── 6. Sample KPI Logs (3 months) ──
   const allStaff = await prisma.staff.findMany()

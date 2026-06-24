@@ -85,6 +85,17 @@ const ROLE_PERMISSIONS: Record<string, {
       'purchasing-tepat-waktu', 'pemeliharaan-kendaraan', 'kebersihan-gudang',
     ],
   },
+  'coach': {
+    canSubmitKpi: true,
+    canViewReports: false,
+    canManageStaff: false,
+    canApproveKpi: false,
+    allowedKpiSlugs: [
+      'jumlah-member-aktif', 'retensi-member', 'sesi-personal-training',
+      'kebersihan-alat-gym', 'kepuasan-member', 'akuisisi-member-baru',
+      'target-revenue-gym', 'upselling-paket-gym',
+    ],
+  },
 }
 
 // Metadata for each role — description and visual config
@@ -96,6 +107,7 @@ const ROLE_METADATA: Record<string, { name: string; description: string; color: 
   'cs':               { name: 'Customer Service', description: 'Customer service — pendaftaran & informasi', color: '#D4B98A' },
   'apoteker':         { name: 'Apoteker',         description: 'Apotek — peracikan & manajemen obat', color: '#CD7F32' },
   'gudang':           { name: 'Gudang',           description: 'Gudang & logistik — stok & distribusi', color: '#6B1D30' },
+  'coach':            { name: 'Coach',            description: 'Personal trainer & gym staff — KPI gym', color: '#2E7D32' },
 }
 
 export async function GET() {
