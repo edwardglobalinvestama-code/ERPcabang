@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import {
   BarChart,
   Bar,
@@ -10,6 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  Cell,
 } from "recharts"
 import {
   Users,
@@ -25,6 +27,8 @@ import {
   XCircle,
   Stethoscope,
   LogOut,
+  Crown,
+  Medal,
 } from "lucide-react"
 import { cn, formatDate, formatPercent } from "@/lib/utils"
 
@@ -254,15 +258,18 @@ export default function AdminPage() {
   )
 
   // ── Chart data from dashboard ──
+  const brandColors = ["#731D36", "#C9A96E", "#E2A6C0", "#8B2A45"]
+  const branchBrandColors = ["#C9A96E", "#E2A6C0", "#731D36", "#D4B98A"]
+
   const roleChartData: ChartData[] = (dashboard?.kpiByRole || []).map((item, i) => ({
     name: item.role.name,
     score: Number(item.score) || 0,
-    fill: i % 2 === 0 ? "#731D36" : "#C9A96E",
+    fill: brandColors[i % brandColors.length],
   }))
   const branchChartData: ChartData[] = (dashboard?.kpiByBranch || []).map((item, i) => ({
     name: item.branch.name,
     score: Number(item.score) || 0,
-    fill: i % 2 === 0 ? "#C9A96E" : "#E2A6C0",
+    fill: branchBrandColors[i % branchBrandColors.length],
   }))
   const topPerformers = dashboard?.topPerformers || []
   const recentLogs = dashboard?.recentLogs || []
@@ -270,16 +277,30 @@ export default function AdminPage() {
   // ── Not logged in → redirect to landing ──
   if (!loggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-6">
-        <div className="max-w-sm w-full card space-y-6 text-center">
-          <div className="mx-auto w-14 h-14 rounded-xl bg-primary flex items-center justify-center">
-            <Award className="w-7 h-7 text-white" />
+      <div className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#731D3615,_transparent_70%),radial-gradient(ellipse_at_bottom_left,_#C9A96E10,_transparent_70%)]" />
+        <div className="max-w-sm w-full card space-y-6 text-center relative z-10">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-[#731D36] to-[#8B2A45] flex items-center justify-center shadow-lg shadow-[#731D36]/30">
+            <Image
+              src="/logo-inusa.png"
+              alt="Inusa Clinic"
+              width={32}
+              height={32}
+              className="brightness-0 invert"
+            />
           </div>
-          <h2 className="text-xl font-bold text-white">Admin Dashboard</h2>
+          <div>
+            <h2 className="text-xl font-bold text-white">Inusa Clinic</h2>
+            <p className="text-sm text-gray-400 mt-1">Admin Dashboard</p>
+          </div>
           <p className="text-sm text-gray-400">
             Silakan login sebagai Branch Manager dari halaman utama
           </p>
-          <a href="/" className="btn-primary inline-block w-full text-center">
+          <a
+            href="/"
+            className="inline-block w-full text-center px-4 py-2.5 rounded-lg font-medium text-sm text-white bg-gradient-to-r from-[#731D36] to-[#8B2A45] hover:from-[#8B2A45] hover:to-[#731D36] transition-all duration-300 shadow-lg shadow-[#731D36]/30"
+          >
             Ke Halaman Login
           </a>
         </div>
@@ -288,84 +309,141 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      {/* Background subtle gradient pattern */}
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_#731D3608,_transparent_70%),radial-gradient(ellipse_at_bottom_left,_#C9A96E06,_transparent_70%)]" />
+
       {/* ── Header ── */}
-      <header className="border-b border-white/5 bg-surface-light/50 backdrop-blur-sm sticky top-0 z-20">
+      <header className="border-b border-white/5 bg-surface-light/80 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Stethoscope className="w-5 h-5 text-primary" />
-            <h1 className="font-bold text-white">Admin Dashboard</h1>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#731D36] to-[#8B2A45] flex items-center justify-center overflow-hidden p-1 shadow-sm">
+              <Image
+                src="/logo-inusa.png"
+                alt="Inusa"
+                width={24}
+                height={24}
+                className="brightness-0 invert w-full h-full object-contain"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <h1 className="font-bold text-white text-lg tracking-tight">
+                Inusa <span className="text-[#C9A96E]">Clinic</span>
+              </h1>
+              <span className="hidden sm:inline-block w-px h-5 bg-white/10" />
+              <span className="hidden sm:inline text-xs text-gray-500">Dashboard</span>
+            </div>
             {authStaff && (
-              <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
-                {authStaff.name}
-              </span>
+              <div className="flex items-center gap-1.5 ml-2">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#731D36] to-[#C9A96E] flex items-center justify-center">
+                  <span className="text-[9px] font-bold text-white">
+                    {authStaff.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <span className="text-xs bg-[#C9A96E]/15 text-[#C9A96E] px-2.5 py-0.5 rounded-full font-medium border border-[#C9A96E]/20">
+                  {authStaff.name}
+                </span>
+              </div>
             )}
           </div>
-          <button
-            onClick={() => {
-              sessionStorage.clear()
-              window.location.href = "/"
-            }}
-            className="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 transition-colors"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Keluar
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={loadData}
+              className="text-xs text-gray-500 hover:text-[#C9A96E] flex items-center gap-1.5 transition-colors"
+              title="Refresh data"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+            <button
+              onClick={() => {
+                sessionStorage.clear()
+                window.location.href = "/"
+              }}
+              className="text-xs text-gray-500 hover:text-white flex items-center gap-1.5 transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Keluar
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 relative z-10">
         {/* ── Success/Error banners ── */}
         {staffFormSuccess && (
-          <div className="bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-lg">
+          <div className="bg-[#C9A96E]/10 border border-[#C9A96E]/30 text-[#C9A96E] text-sm px-4 py-3 rounded-lg">
             {staffFormSuccess}
           </div>
         )}
 
         {/* ── Overview Cards ── */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="card flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
-              <Users className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider">Total Staff</p>
-              <p className="text-2xl font-bold text-white">
-                {loading ? "—" : dashboard?.totalStaff ?? "—"}
-              </p>
-            </div>
-          </div>
-          <div className="card flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center shrink-0">
-              <Activity className="w-6 h-6 text-secondary" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider">Staff Aktif</p>
-              <p className="text-2xl font-bold text-white">
-                {loading ? "—" : dashboard?.totalActiveStaff ?? "—"}
-              </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Total Staff - Maroon */}
+          <div className="card relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#731D36]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-[#731D36]/5 blur-xl" />
+            <div className="relative flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#731D36] to-[#8B2A45] flex items-center justify-center shrink-0 shadow-lg shadow-[#731D36]/25">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wider">Total Staff</p>
+                <p className="text-2xl font-bold text-white">
+                  {loading ? "—" : dashboard?.totalStaff ?? "—"}
+                </p>
+              </div>
             </div>
           </div>
-          <div className="card flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
-              <Building2 className="w-6 h-6 text-accent" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider">Cabang</p>
-              <p className="text-2xl font-bold text-white">
-                {loading ? "—" : dashboard?.totalBranches ?? "—"}
-              </p>
+
+          {/* Staff Aktif - Gold */}
+          <div className="card relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#C9A96E]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-[#C9A96E]/5 blur-xl" />
+            <div className="relative flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#C9A96E] to-[#D4B98A] flex items-center justify-center shrink-0 shadow-lg shadow-[#C9A96E]/25">
+                <Activity className="w-6 h-6 text-[#1A1A2E]" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wider">Staff Aktif</p>
+                <p className="text-2xl font-bold text-white">
+                  {loading ? "—" : dashboard?.totalActiveStaff ?? "—"}
+                </p>
+              </div>
             </div>
           </div>
-          <div className="card flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center shrink-0">
-              <TrendingUp className="w-6 h-6 text-green-400" />
+
+          {/* Cabang - Pink Rose */}
+          <div className="card relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#E2A6C0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-[#E2A6C0]/5 blur-xl" />
+            <div className="relative flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#E2A6C0] to-[#F0C4D8] flex items-center justify-center shrink-0 shadow-lg shadow-[#E2A6C0]/25">
+                <Building2 className="w-6 h-6 text-[#1A1A2E]" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wider">Cabang</p>
+                <p className="text-2xl font-bold text-white">
+                  {loading ? "—" : dashboard?.totalBranches ?? "—"}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider">Rata-rata KPI</p>
-              <p className="text-2xl font-bold text-white">
-                {loading ? "—" : dashboard ? formatPercent(dashboard.averageKpiScore) : "—"}
-              </p>
+          </div>
+
+          {/* Rata-rata KPI - Maroon + Gold gradient */}
+          <div className="card relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#731D36]/8 to-[#C9A96E]/8 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-gradient-to-br from-[#731D36]/5 to-[#C9A96E]/5 blur-xl" />
+            <div className="relative flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#731D36] via-[#8B2A45] to-[#C9A96E] flex items-center justify-center shrink-0 shadow-lg shadow-[#731D36]/25">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wider">Rata-rata KPI</p>
+                <p className="text-2xl font-bold text-white">
+                  {loading ? "—" : dashboard ? formatPercent(dashboard.averageKpiScore) : "—"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -399,12 +477,12 @@ export default function AdminPage() {
           {/* Score by Role */}
           <div className="card">
             <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-4 h-4 text-secondary" />
+              <TrendingUp className="w-4 h-4 text-[#C9A96E]" />
               <h3 className="text-sm font-semibold text-white">Skor KPI per Peran</h3>
             </div>
             {loading ? (
               <div className="h-64 flex items-center justify-center">
-                <span className="inline-block w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                <span className="inline-block w-6 h-6 border-2 border-[#731D36]/30 border-t-[#731D36] rounded-full animate-spin" />
               </div>
             ) : roleChartData.length === 0 ? (
               <div className="h-64 flex items-center justify-center text-gray-500 text-sm">
@@ -416,8 +494,15 @@ export default function AdminPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                   <XAxis dataKey="name" tick={{ fill: "#9CA3AF", fontSize: 11 }} axisLine={{ stroke: "#ffffff10" }} />
                   <YAxis tick={{ fill: "#9CA3AF", fontSize: 11 }} axisLine={{ stroke: "#ffffff10" }} />
-                  <Tooltip contentStyle={{ backgroundColor: "#232340", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff" }} />
-                  <Bar dataKey="score" radius={[4, 4, 0, 0]} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "#232340", border: "1px solid rgba(197, 169, 110, 0.2)", borderRadius: 8, color: "#fff" }}
+                    cursor={{ fill: "rgba(255,255,255,0.03)" }}
+                  />
+                  <Bar dataKey="score" radius={[6, 6, 0, 0]} barSize={40}>
+                    {roleChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -426,12 +511,12 @@ export default function AdminPage() {
           {/* Score by Branch */}
           <div className="card">
             <div className="flex items-center gap-2 mb-4">
-              <Building2 className="w-4 h-4 text-accent" />
+              <Building2 className="w-4 h-4 text-[#E2A6C0]" />
               <h3 className="text-sm font-semibold text-white">Skor KPI per Cabang</h3>
             </div>
             {loading ? (
               <div className="h-64 flex items-center justify-center">
-                <span className="inline-block w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                <span className="inline-block w-6 h-6 border-2 border-[#731D36]/30 border-t-[#731D36] rounded-full animate-spin" />
               </div>
             ) : branchChartData.length === 0 ? (
               <div className="h-64 flex items-center justify-center text-gray-500 text-sm">
@@ -443,8 +528,15 @@ export default function AdminPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                   <XAxis dataKey="name" tick={{ fill: "#9CA3AF", fontSize: 11 }} axisLine={{ stroke: "#ffffff10" }} />
                   <YAxis tick={{ fill: "#9CA3AF", fontSize: 11 }} axisLine={{ stroke: "#ffffff10" }} />
-                  <Tooltip contentStyle={{ backgroundColor: "#232340", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff" }} />
-                  <Bar dataKey="score" radius={[4, 4, 0, 0]} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "#232340", border: "1px solid rgba(226, 166, 192, 0.2)", borderRadius: 8, color: "#fff" }}
+                    cursor={{ fill: "rgba(255,255,255,0.03)" }}
+                  />
+                  <Bar dataKey="score" radius={[6, 6, 0, 0]} barSize={40}>
+                    {branchChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -452,14 +544,16 @@ export default function AdminPage() {
         </div>
 
         {/* ── Top Performers ── */}
-        <div className="card">
+        <div className="card relative overflow-hidden">
+          {/* Subtle gold accent bar */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A96E] to-transparent opacity-40" />
           <div className="flex items-center gap-2 mb-4">
-            <Award className="w-4 h-4 text-secondary" />
+            <Award className="w-4 h-4 text-[#C9A96E]" />
             <h3 className="text-sm font-semibold text-white">Top Performers</h3>
           </div>
           {loading ? (
             <div className="py-8 flex justify-center">
-              <span className="inline-block w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <span className="inline-block w-6 h-6 border-2 border-[#731D36]/30 border-t-[#731D36] rounded-full animate-spin" />
             </div>
           ) : topPerformers.length === 0 ? (
             <div className="py-8 text-center text-gray-500 text-sm">Belum ada data</div>
@@ -468,7 +562,7 @@ export default function AdminPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/5 text-gray-400 text-xs uppercase tracking-wider">
-                    <th className="text-left py-3 pr-4">#</th>
+                    <th className="text-left py-3 pr-4">Peringkat</th>
                     <th className="text-left py-3 pr-4">Nama</th>
                     <th className="text-left py-3 pr-4">Peran</th>
                     <th className="text-left py-3 pr-4">Cabang</th>
@@ -479,21 +573,44 @@ export default function AdminPage() {
                   {topPerformers.map((p, i) => (
                     <tr key={p.staff.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
                       <td className="py-3 pr-4">
+                        {i === 0 ? (
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#C9A96E] to-[#D4B98A] flex items-center justify-center shadow-lg shadow-[#C9A96E]/30">
+                            <Crown className="w-4 h-4 text-[#1A1A2E]" />
+                          </div>
+                        ) : i === 1 ? (
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#9CA3AF] to-[#D1D5DB] flex items-center justify-center shadow-lg shadow-gray-400/20">
+                            <Medal className="w-4 h-4 text-[#1A1A2E]" />
+                          </div>
+                        ) : i === 2 ? (
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#CD7F32] to-[#D4956A] flex items-center justify-center shadow-lg shadow-[#CD7F32]/30">
+                            <Medal className="w-4 h-4 text-white" />
+                          </div>
+                        ) : (
+                          <span className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-xs font-bold text-gray-500">
+                            {i + 1}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 pr-4">
                         <span className={cn(
-                          "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-                          i === 0 ? "bg-yellow-500/20 text-yellow-400" :
-                          i === 1 ? "bg-gray-400/20 text-gray-400" :
-                          i === 2 ? "bg-orange-500/20 text-orange-400" :
-                          "bg-white/5 text-gray-500"
+                          "font-medium",
+                          i === 0 ? "text-[#C9A96E]" : i === 1 ? "text-gray-300" : i === 2 ? "text-[#CD7F32]" : "text-gray-200"
                         )}>
-                          {i + 1}
+                          {p.staff.name}
                         </span>
                       </td>
-                      <td className="py-3 pr-4 text-gray-200">{p.staff.name}</td>
                       <td className="py-3 pr-4 text-gray-300">{p.role.name}</td>
                       <td className="py-3 pr-4 text-gray-300">{p.branch.name}</td>
-                      <td className="py-3 text-right font-mono text-accent font-semibold">
-                        {formatPercent(p.score)}
+                      <td className="py-3 text-right font-mono font-semibold">
+                        <span className={cn(
+                          "px-2.5 py-0.5 rounded-full text-xs",
+                          i === 0 ? "bg-[#C9A96E]/15 text-[#C9A96E]" :
+                          i === 1 ? "bg-gray-400/15 text-gray-300" :
+                          i === 2 ? "bg-[#CD7F32]/15 text-[#CD7F32]" :
+                          "bg-white/5 text-accent"
+                        )}>
+                          {formatPercent(p.score)}
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -504,14 +621,16 @@ export default function AdminPage() {
         </div>
 
         {/* ── Recent KPI Logs ── */}
-        <div className="card">
+        <div className="card relative overflow-hidden">
+          {/* Subtle pink accent bar */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#E2A6C0] to-transparent opacity-40" />
           <div className="flex items-center gap-2 mb-4">
-            <Activity className="w-4 h-4 text-accent" />
+            <Activity className="w-4 h-4 text-[#E2A6C0]" />
             <h3 className="text-sm font-semibold text-white">Log KPI Terbaru</h3>
           </div>
           {loading ? (
             <div className="py-8 flex justify-center">
-              <span className="inline-block w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <span className="inline-block w-6 h-6 border-2 border-[#731D36]/30 border-t-[#731D36] rounded-full animate-spin" />
             </div>
           ) : recentLogs.length === 0 ? (
             <div className="py-8 text-center text-gray-500 text-sm">Belum ada log KPI</div>
@@ -532,15 +651,15 @@ export default function AdminPage() {
                     <tr key={i} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
                       <td className="py-3 pr-4 text-gray-200">{log.staff?.name || "-"}</td>
                       <td className="py-3 pr-4 text-gray-300">{log.category?.name || "-"}</td>
-                      <td className="py-3 pr-4 text-right font-mono text-accent">
+                      <td className="py-3 pr-4 text-right font-mono text-[#E2A6C0]">
                         {Number(log.value).toLocaleString()}
                       </td>
                       <td className="py-3 pr-4 text-right font-mono">
                         <span className={cn(
-                          "text-xs px-2 py-0.5 rounded-full",
-                          log.score >= 80 ? "bg-green-500/10 text-green-400" :
-                          log.score >= 50 ? "bg-yellow-500/10 text-yellow-400" :
-                          "bg-red-500/10 text-red-400"
+                          "text-xs px-2.5 py-0.5 rounded-full font-medium",
+                          log.score >= 80 ? "bg-[#C9A96E]/15 text-[#C9A96E] border border-[#C9A96E]/20" :
+                          log.score >= 50 ? "bg-[#E2A6C0]/15 text-[#E2A6C0] border border-[#E2A6C0]/20" :
+                          "bg-[#731D36]/20 text-[#E2A6C0] border border-[#731D36]/30"
                         )}>
                           {formatPercent(log.score)}
                         </span>
@@ -555,10 +674,12 @@ export default function AdminPage() {
         </div>
 
         {/* ── Staff Management ── */}
-        <div className="card">
+        <div className="card relative overflow-hidden border-2 border-[#C9A96E]/10 hover:border-[#C9A96E]/20 transition-colors duration-300">
+          {/* Gold top accent */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A96E] to-transparent opacity-50" />
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-secondary" />
+              <Users className="w-4 h-4 text-[#C9A96E]" />
               <h3 className="text-sm font-semibold text-white">Manajemen Staff</h3>
             </div>
             <button
@@ -584,9 +705,9 @@ export default function AdminPage() {
 
           {/* Create Staff Form */}
           {showStaffForm && (
-            <form onSubmit={handleCreateStaff} className="mb-6 p-4 bg-white/[0.03] rounded-xl border border-white/5 space-y-4">
+            <form onSubmit={handleCreateStaff} className="mb-6 p-4 bg-white/[0.03] rounded-xl border border-[#C9A96E]/15 space-y-4">
               {staffFormError && (
-                <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">
+                <div className="bg-[#731D36]/15 border border-[#731D36]/30 text-[#E2A6C0] text-sm px-4 py-3 rounded-lg">
                   {staffFormError}
                 </div>
               )}
@@ -636,7 +757,7 @@ export default function AdminPage() {
           {/* Staff Table */}
           {loading ? (
             <div className="py-8 flex justify-center">
-              <span className="inline-block w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <span className="inline-block w-6 h-6 border-2 border-[#731D36]/30 border-t-[#731D36] rounded-full animate-spin" />
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -665,15 +786,25 @@ export default function AdminPage() {
                         <td className="py-3 pr-4 text-gray-200">{s.name}</td>
                         <td className="py-3 pr-4 text-gray-300 text-xs">{s.branch?.name || "-"}</td>
                         <td className="py-3 pr-4">
-                          <span className="text-xs bg-white/5 px-2 py-0.5 rounded">{s.role?.name || "-"}</span>
+                          <span className="text-xs bg-[#731D36]/10 text-[#E2A6C0] px-2 py-0.5 rounded border border-[#731D36]/20">{s.role?.name || "-"}</span>
                         </td>
                         <td className="py-3 pr-4">
-                          <span className={cn("text-xs px-2 py-0.5 rounded-full", s.isActive ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400")}>
+                          <span className={cn(
+                            "text-xs px-2.5 py-0.5 rounded-full font-medium border",
+                            s.isActive
+                              ? "bg-[#C9A96E]/10 text-[#C9A96E] border-[#C9A96E]/20"
+                              : "bg-[#731D36]/15 text-[#E2A6C0] border-[#731D36]/30"
+                          )}>
                             {s.isActive ? "Aktif" : "Nonaktif"}
                           </span>
                         </td>
                         <td className="py-3 text-right">
-                          <button onClick={() => toggleStaffActive(s)} className={cn("text-xs flex items-center gap-1 ml-auto transition-colors", s.isActive ? "text-red-400 hover:text-red-300" : "text-green-400 hover:text-green-300")}>
+                          <button onClick={() => toggleStaffActive(s)} className={cn(
+                            "text-xs flex items-center gap-1 ml-auto transition-colors px-2.5 py-1 rounded-lg",
+                            s.isActive
+                              ? "text-[#E2A6C0] hover:text-white hover:bg-[#731D36]/20"
+                              : "text-[#C9A96E] hover:text-white hover:bg-[#C9A96E]/15"
+                          )}>
                             {s.isActive ? (<><XCircle className="w-3.5 h-3.5" /> Nonaktifkan</>) : (<><CheckCircle className="w-3.5 h-3.5" /> Aktifkan</>)}
                           </button>
                         </td>

@@ -13,8 +13,14 @@ import {
   Award,
   ChevronDown,
   Search,
-  Stethoscope,
   LogOut,
+  User,
+  Shield,
+  AlertCircle,
+  CheckCircle2,
+  Users,
+  ClipboardCheck,
+  Star,
 } from "lucide-react"
 import { cn, formatDate, formatCurrency, formatPercent } from "@/lib/utils"
 
@@ -195,54 +201,85 @@ export default function ReportsPage() {
   // ── Not logged in → login screen ──
   if (!loggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-6">
-        <div className="max-w-sm w-full card space-y-6">
-          <div className="text-center space-y-2">
-            <div className="mx-auto w-14 h-14 rounded-xl bg-primary flex items-center justify-center">
-              <BarChart3 className="w-7 h-7 text-white" />
-            </div>
-            <h2 className="text-xl font-bold text-white">Laporan KPI</h2>
-            <p className="text-sm text-gray-400">
-              Masukkan PIN untuk mengakses laporan
-            </p>
-          </div>
-          {loginError && (
-            <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">
-              {loginError}
-            </div>
-          )}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="password"
-              value={pin}
-              onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
-              placeholder="PIN"
-              className="input-field text-center text-lg tracking-widest"
-              maxLength={6}
-              inputMode="numeric"
-              autoFocus
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-br from-surface via-surface to-surface-dark">
+        {/* Inusa Logo Header */}
+        <div className="mb-10 text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary shadow-lg shadow-primary/20 mb-4">
+            <img
+              src="/logo-inusa.png"
+              alt="Inusa"
+              className="w-12 h-12 object-contain"
             />
-            <button type="submit" className="btn-primary w-full">
-              Masuk
-            </button>
-          </form>
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Inusa Clinic
+          </h1>
+          <p className="text-sm text-secondary mt-1 font-medium">
+            Laporan KPI
+          </p>
+        </div>
+
+        <div className="max-w-sm w-full">
+          <div className="bg-surface-light rounded-2xl border border-white/5 p-8 shadow-xl shadow-black/20">
+            <div className="text-center space-y-1 mb-6">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center mb-3">
+                <BarChart3 className="w-6 h-6 text-secondary" />
+              </div>
+              <p className="text-sm text-gray-400">
+                Masukkan PIN untuk mengakses laporan
+              </p>
+            </div>
+            {loginError && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg mb-4 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{loginError}</span>
+              </div>
+            )}
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-300">PIN Akses</label>
+                <input
+                  type="password"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+                  placeholder="· · · · · ·"
+                  className="input-field text-center text-lg tracking-[0.3em]"
+                  maxLength={6}
+                  inputMode="numeric"
+                  autoFocus
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn-primary w-full py-2.5"
+              >
+                Masuk
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-surface via-surface to-surface-dark">
       {/* ── Header ── */}
-      <header className="border-b border-white/5 bg-surface-light/50 backdrop-blur-sm sticky top-0 z-20">
+      <header className="border-b border-white/5 bg-surface-light/80 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Stethoscope className="w-5 h-5 text-primary" />
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm shadow-primary/30">
+              <img
+                src="/logo-inusa.png"
+                alt="Inusa"
+                className="w-5 h-5 object-contain brightness-0 invert"
+              />
+            </div>
             <h1 className="font-bold text-white">Laporan KPI</h1>
           </div>
           <button
             onClick={() => setLoggedIn(false)}
-            className="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 transition-colors"
+            className="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 transition-colors hover:bg-white/5 px-2.5 py-1.5 rounded-lg"
           >
             <LogOut className="w-3.5 h-3.5" />
             Keluar
@@ -252,16 +289,18 @@ export default function ReportsPage() {
 
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* ── Filters ── */}
-        <div className="card">
-          <div className="flex items-center gap-2 mb-6">
-            <Filter className="w-5 h-5 text-secondary" />
+        <div className="bg-surface-light rounded-2xl border border-secondary/20 shadow-xl shadow-black/10 p-6">
+          <div className="flex items-center gap-2 mb-6 pb-4 border-b border-white/5">
+            <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center">
+              <Filter className="w-4 h-4 text-secondary" />
+            </div>
             <h2 className="text-lg font-semibold text-white">Filter</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Branch */}
             <div className="space-y-1.5">
-              <label className="text-xs text-gray-400 flex items-center gap-1">
+              <label className="text-xs text-gray-400 flex items-center gap-1 font-medium">
                 <Building2 className="w-3 h-3" />
                 Cabang
               </label>
@@ -281,7 +320,7 @@ export default function ReportsPage() {
 
             {/* Role */}
             <div className="space-y-1.5">
-              <label className="text-xs text-gray-400 flex items-center gap-1">
+              <label className="text-xs text-gray-400 flex items-center gap-1 font-medium">
                 <Award className="w-3 h-3" />
                 Peran
               </label>
@@ -301,7 +340,7 @@ export default function ReportsPage() {
 
             {/* Period */}
             <div className="space-y-1.5">
-              <label className="text-xs text-gray-400 flex items-center gap-1">
+              <label className="text-xs text-gray-400 flex items-center gap-1 font-medium">
                 <Calendar className="w-3 h-3" />
                 Periode
               </label>
@@ -318,7 +357,7 @@ export default function ReportsPage() {
 
             {/* Date From */}
             <div className="space-y-1.5">
-              <label className="text-xs text-gray-400">Dari Tanggal</label>
+              <label className="text-xs text-gray-400 font-medium">Dari Tanggal</label>
               <input
                 type="date"
                 value={dateFrom}
@@ -329,7 +368,7 @@ export default function ReportsPage() {
 
             {/* Date To */}
             <div className="space-y-1.5">
-              <label className="text-xs text-gray-400">Sampai Tanggal</label>
+              <label className="text-xs text-gray-400 font-medium">Sampai Tanggal</label>
               <input
                 type="date"
                 value={dateTo}
@@ -342,80 +381,92 @@ export default function ReportsPage() {
 
         {/* ── Summary Cards ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="card flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
-              <Target className="w-5 h-5 text-primary" />
+          {/* Total Staff - Maroon */}
+          <div className="bg-surface-light rounded-2xl border border-primary/20 shadow-lg shadow-black/10 p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shrink-0 shadow-sm shadow-primary/30">
+              <Users className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">
-                Staff
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">
+                Total Staff
               </p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-2xl font-bold text-white mt-0.5">
                 {loading ? "—" : summary.totalStaff}
               </p>
             </div>
           </div>
-          <div className="card flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-secondary/20 flex items-center justify-center shrink-0">
-              <TrendingUp className="w-5 h-5 text-secondary" />
+
+          {/* Avg Score - Gold */}
+          <div className="bg-surface-light rounded-2xl border border-secondary/20 shadow-lg shadow-black/10 p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-secondary to-secondary-dark flex items-center justify-center shrink-0 shadow-sm shadow-secondary/30">
+              <Star className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">
                 Rata-rata Skor
               </p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-2xl font-bold text-white mt-0.5">
                 {loading ? "—" : formatPercent(summary.avgScore)}
               </p>
             </div>
           </div>
-          <div className="card flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
-              <FileText className="w-5 h-5 text-accent" />
+
+          {/* Total Entries - Pink Rose */}
+          <div className="bg-surface-light rounded-2xl border border-accent/20 shadow-lg shadow-black/10 p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+              <ClipboardCheck className="w-6 h-5 text-accent" />
             </div>
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">
                 Total Entries
               </p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-2xl font-bold text-white mt-0.5">
                 {loading ? "—" : summary.totalEntries.toLocaleString()}
               </p>
             </div>
           </div>
-          <div className="card flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center shrink-0">
-              <Award className="w-5 h-5 text-green-400" />
+
+          {/* Disetujui - Maroon */}
+          <div className="bg-surface-light rounded-2xl border border-primary/20 shadow-lg shadow-black/10 p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shrink-0 shadow-sm shadow-primary/30">
+              <CheckCircle2 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">
                 Disetujui
               </p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-2xl font-bold text-white mt-0.5">
                 {loading ? "—" : summary.approvedEntries.toLocaleString()}
               </p>
             </div>
           </div>
         </div>
 
-        {/* ── Export ── */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Search className="w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari staff..."
-              className="input-field max-w-xs text-sm"
-            />
+        {/* ── Search & Export ── */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="relative w-full sm:w-64">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari staff..."
+                className="input-field pl-9 text-sm w-full"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             {exportMsg && (
-              <span className="text-xs text-green-400">{exportMsg}</span>
+              <span className="text-xs text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                <CheckCircle2 className="w-3 h-3" />
+                {exportMsg}
+              </span>
             )}
             <button
               onClick={handleExport}
               disabled={exporting || loading}
-              className="btn-primary text-sm flex items-center gap-2"
+              className="bg-gradient-to-r from-secondary to-secondary-light hover:from-secondary-light hover:to-secondary text-white font-medium text-sm px-5 py-2.5 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-secondary/20"
             >
               {exporting ? (
                 <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -430,13 +481,15 @@ export default function ReportsPage() {
         </div>
 
         {/* ── Score Breakdown Table ── */}
-        <div className="card">
-          <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-4 h-4 text-secondary" />
+        <div className="bg-surface-light rounded-2xl border border-white/5 shadow-xl shadow-black/10 p-6">
+          <div className="flex items-center gap-2 mb-6 pb-4 border-b border-white/5">
+            <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center">
+              <BarChart3 className="w-4 h-4 text-secondary" />
+            </div>
             <h3 className="text-sm font-semibold text-white">
               Rincian Skor per Staff
             </h3>
-            <span className="text-[11px] text-gray-500 ml-2">
+            <span className="text-[11px] text-gray-500 ml-2 bg-white/5 px-2 py-0.5 rounded-full">
               {filteredScores.length} staff
             </span>
           </div>
@@ -448,42 +501,51 @@ export default function ReportsPage() {
             </div>
           ) : filteredScores.length === 0 ? (
             <div className="py-16 text-center">
-              <BarChart3 className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-              <p className="text-gray-500 text-sm">Belum ada data laporan</p>
+              <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+                <BarChart3 className="w-8 h-8 text-gray-600" />
+              </div>
+              <p className="text-gray-400 text-sm font-medium">Belum ada data laporan</p>
               <p className="text-gray-600 text-xs mt-1">
                 Sesuaikan filter untuk melihat data
               </p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {filteredScores.map((staff) => (
                 <div
                   key={staff.id}
-                  className="bg-white/[0.02] rounded-xl border border-white/5 p-4"
+                  className="bg-white/[0.03] rounded-xl border border-white/5 p-5 hover:border-primary/10 transition-colors"
                 >
                   {/* Staff header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h4 className="text-sm font-semibold text-white">
-                        {staff.name}
-                      </h4>
-                      <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[11px] text-gray-500 font-mono">
-                          {staff.nip}
-                        </span>
-                        <span className="text-[11px] bg-white/5 px-2 py-0.5 rounded text-gray-400">
-                          {staff.role}
-                        </span>
-                        <span className="text-[11px] text-gray-500">
-                          {staff.entriesCount} entries
-                        </span>
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                        {staff.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-white">
+                          {staff.name}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[11px] text-gray-500 font-mono">
+                            {staff.nip}
+                          </span>
+                          <span className="w-1 h-1 rounded-full bg-gray-600" />
+                          <span className="text-[11px] bg-secondary/10 text-secondary px-2 py-0.5 rounded font-medium">
+                            {staff.role}
+                          </span>
+                          <span className="w-1 h-1 rounded-full bg-gray-600" />
+                          <span className="text-[11px] text-gray-500">
+                            {staff.entriesCount} entries
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-accent">
+                      <p className="text-xl font-bold text-accent">
                         {formatPercent(staff.totalScore)}
                       </p>
-                      <p className="text-[10px] text-gray-500">
+                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">
                         Total Skor
                       </p>
                     </div>
@@ -491,7 +553,7 @@ export default function ReportsPage() {
 
                   {/* Category bars */}
                   {staff.categories && staff.categories.length > 0 && (
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {staff.categories.map((cat, ci) => {
                         const pct =
                           cat.target > 0
@@ -499,23 +561,23 @@ export default function ReportsPage() {
                             : 0
                         return (
                           <div key={ci} className="flex items-center gap-3">
-                            <span className="text-xs text-gray-400 w-36 shrink-0 truncate">
+                            <span className="text-[11px] text-gray-400 w-28 shrink-0 truncate font-medium">
                               {cat.name}
                             </span>
-                            <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                            <div className="flex-1 h-2.5 bg-white/5 rounded-full overflow-hidden">
                               <div
                                 className={cn(
-                                  "h-full rounded-full transition-all duration-500",
+                                  "h-full rounded-full transition-all duration-700 ease-out",
                                   pct >= 80
-                                    ? "bg-green-500"
+                                    ? "bg-gradient-to-r from-green-500 to-green-400"
                                     : pct >= 50
-                                    ? "bg-yellow-500"
-                                    : "bg-red-500"
+                                    ? "bg-gradient-to-r from-yellow-500 to-yellow-400"
+                                    : "bg-gradient-to-r from-red-500 to-red-400"
                                 )}
                                 style={{ width: `${pct}%` }}
                               />
                             </div>
-                            <span className="text-xs font-mono text-gray-300 w-16 text-right">
+                            <span className="text-xs font-mono text-gray-300 w-20 text-right">
                               {cat.value}
                               <span className="text-gray-500">
                                 /{cat.target}
