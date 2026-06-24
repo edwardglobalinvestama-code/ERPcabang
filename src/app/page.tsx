@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Building2, Stethoscope, Activity, ArrowRight, Lock } from "lucide-react"
+import { Building2, Stethoscope, Activity, ArrowRight, Lock, Package } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const branches = [
@@ -17,6 +17,7 @@ const roles = [
   { id: 4, name: "Terapis", slug: "terapis" },
   { id: 5, name: "Customer Service", slug: "cs" },
   { id: 6, name: "Apoteker", slug: "apoteker" },
+  { id: 7, name: "Gudang", slug: "gudang" },
 ]
 
 export default function LandingPage() {
@@ -78,6 +79,7 @@ export default function LandingPage() {
     "Terapis": <Activity className="w-8 h-8 text-accent" />,
     "Customer Service": <Building2 className="w-8 h-8 text-secondary" />,
     "Apoteker": <Stethoscope className="w-8 h-8 text-accent" />,
+    "Gudang": <Package className="w-8 h-8 text-secondary" />,
   }
 
   return (

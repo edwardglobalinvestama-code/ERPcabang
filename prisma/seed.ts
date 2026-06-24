@@ -43,6 +43,7 @@ async function main() {
     prisma.role.create({ data: { name: 'Terapis', slug: 'terapis', description: 'Terapis treatment' } }),
     prisma.role.create({ data: { name: 'Customer Service', slug: 'cs', description: 'Customer service' } }),
     prisma.role.create({ data: { name: 'Apoteker', slug: 'apoteker', description: 'Apoteker' } }),
+    prisma.role.create({ data: { name: 'Gudang', slug: 'gudang', description: 'Staff gudang & logistik' } }),
   ])
   console.log(`  ✓ Created ${roles.length} roles`)
 
@@ -104,6 +105,16 @@ async function main() {
     { name: 'Waktu Peracikan', slug: 'waktu-peracikan', description: 'Kecepatan meracik', weight: 1.5, roleId: roleMap['apoteker'] },
     { name: 'Manajemen Stok', slug: 'manajemen-stok', description: 'Akurasi stok obat', weight: 2.0, roleId: roleMap['apoteker'] },
     { name: 'Kepatuhan Resep Dokter', slug: 'kepatuhan-resep', description: 'Verifikasi resep dokter', weight: 1.5, roleId: roleMap['apoteker'] },
+    // Gudang (9 categories)
+    { name: 'Ketepatan Pengiriman', slug: 'ketepatan-pengiriman', description: 'Ketepatan pengiriman barang', weight: 2.0, roleId: roleMap['gudang'] },
+    { name: 'Minimal Kesalahan Stok', slug: 'minimal-kesalahan-stok', description: 'Akurasi stok gudang', weight: 2.0, roleId: roleMap['gudang'] },
+    { name: 'Pelaporan Stok ED', slug: 'pelaporan-stok-ed', description: 'Pelaporan stok expired', weight: 1.5, roleId: roleMap['gudang'] },
+    { name: 'Monitoring Stok', slug: 'monitoring-stok', description: 'Monitoring stok berkala', weight: 1.5, roleId: roleMap['gudang'] },
+    { name: 'SLA Distribusi', slug: 'sla-distribusi', description: 'SLA distribusi barang', weight: 1.5, roleId: roleMap['gudang'] },
+    { name: 'Kelengkapan Dokumen', slug: 'kelengkapan-dokumen', description: 'Kelengkapan dokumen gudang', weight: 1.5, roleId: roleMap['gudang'] },
+    { name: 'Purchasing Tepat Waktu', slug: 'purchasing-tepat-waktu', description: 'Ketepatan waktu purchasing', weight: 2.0, roleId: roleMap['gudang'] },
+    { name: 'Pemeliharaan Kendaraan', slug: 'pemeliharaan-kendaraan', description: 'Perawatan kendaraan operasional', weight: 1.0, roleId: roleMap['gudang'] },
+    { name: 'Kebersihan & Kerapian Gudang', slug: 'kebersihan-gudang', description: 'Kebersihan dan kerapian gudang', weight: 1.0, roleId: roleMap['gudang'] },
   ]
 
   const categories: any[] = []
@@ -122,6 +133,7 @@ async function main() {
     'terapis': { 'jumlah-terapi': 60, 'kepatuhan-prosedur-terapis': 95, 'kebersihan-ruangan-terapis': 95, 'dokumentasi-terapis': 90, 'upselling-terapis': 5000000, 'target-sales-terapis': 20000000, 'kepuasan-terapis': 90, 'produktivitas-terapis': 85, 'grooming-terapis': 95 },
     'cs': { 'jumlah-pendaftaran': 150, 'waktu-pelayanan': 5, 'kepuasan-cs': 90, 'penanganan-keluhan': 100, 'target-sales-cs': 10000000, 'upselling-cs': 3000000, 'zero-complain-cs': 100, 'grooming-cs': 95 },
     'apoteker': { 'akurasi-resep': 100, 'waktu-peracikan': 10, 'manajemen-stok': 95, 'kepatuhan-resep': 100 },
+    'gudang': { 'ketepatan-pengiriman': 98, 'minimal-kesalahan-stok': 95, 'pelaporan-stok-ed': 100, 'monitoring-stok': 95, 'sla-distribusi': 90, 'kelengkapan-dokumen': 100, 'purchasing-tepat-waktu': 95, 'pemeliharaan-kendaraan': 90, 'kebersihan-gudang': 90 },
   }
 
   const categoryRoleMap: Record<string, number> = {}
@@ -153,6 +165,7 @@ async function main() {
     'terapis': ['Maya Putri', 'Rudi Hermawan', 'Indah Permata'],
     'cs': ['Ani Susanti', 'Deni Pratama', 'Fitriani'],
     'apoteker': ['Fitri Handayani', 'Irfan Maulana'],
+    'gudang': ['Hendra Gunawan', 'Bambang Supriyadi', 'Dwi Hartono'],
   }
 
   let staffCount = 0

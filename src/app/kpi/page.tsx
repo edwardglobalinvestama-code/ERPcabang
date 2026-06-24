@@ -111,6 +111,17 @@ const roleCategories: Record<string, { name: string; slug: string }[]> = {
     { name: 'Target Sales Cabang', slug: 'target-sales-bm' },
     { name: 'Zero Complain', slug: 'zero-complain' },
   ],
+  gudang: [
+    { name: 'Ketepatan Pengiriman', slug: 'ketepatan-pengiriman' },
+    { name: 'Minimal Kesalahan Stok', slug: 'minimal-kesalahan-stok' },
+    { name: 'Pelaporan Stok ED', slug: 'pelaporan-stok-ed' },
+    { name: 'Monitoring Stok', slug: 'monitoring-stok' },
+    { name: 'SLA Distribusi', slug: 'sla-distribusi' },
+    { name: 'Kelengkapan Dokumen', slug: 'kelengkapan-dokumen' },
+    { name: 'Purchasing Tepat Waktu', slug: 'purchasing-tepat-waktu' },
+    { name: 'Pemeliharaan Kendaraan', slug: 'pemeliharaan-kendaraan' },
+    { name: 'Kebersihan & Kerapian Gudang', slug: 'kebersihan-gudang' },
+  ],
 }
 
 export default function KpiPage() {
