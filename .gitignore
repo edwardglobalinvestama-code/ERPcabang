@@ -1,5 +1,9 @@
-node_modules
-# Keep environment variables out of version control
+node_modules/
+.next/
+*.tsbuildinfo
 .env
-
-/generated/prisma
+.env.local
+.env.*.local
+.cache
+prisma/migrations/
+prisma.config.ts
