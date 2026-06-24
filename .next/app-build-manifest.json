@@ -1,0 +1,52 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-652247fbe7d62228.js",
+      "static/chunks/fd9d1056-307a36020502e7d7.js",
+      "static/chunks/117-c2e8725fecde5126.js",
+      "static/chunks/main-app-9d6f1a490c51b14a.js",
+      "static/chunks/app/_not-found/page-3a5d7b576e96f0e0.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-652247fbe7d62228.js",
+      "static/chunks/fd9d1056-307a36020502e7d7.js",
+      "static/chunks/117-c2e8725fecde5126.js",
+      "static/chunks/main-app-9d6f1a490c51b14a.js",
+      "static/css/715e8f77a2ac2cd0.css",
+      "static/chunks/app/layout-4e3b777ac098fd32.js"
+    ],
+    "/admin/page": [
+      "static/chunks/webpack-652247fbe7d62228.js",
+      "static/chunks/fd9d1056-307a36020502e7d7.js",
+      "static/chunks/117-c2e8725fecde5126.js",
+      "static/chunks/main-app-9d6f1a490c51b14a.js",
+      "static/chunks/358-254afb727acc2e17.js",
+      "static/chunks/202-e3c98350d1c356fc.js",
+      "static/chunks/app/admin/page-2d3cb1d1648cb22d.js"
+    ],
+    "/kpi/page": [
+      "static/chunks/webpack-652247fbe7d62228.js",
+      "static/chunks/fd9d1056-307a36020502e7d7.js",
+      "static/chunks/117-c2e8725fecde5126.js",
+      "static/chunks/main-app-9d6f1a490c51b14a.js",
+      "static/chunks/358-254afb727acc2e17.js",
+      "static/chunks/app/kpi/page-73df352c8f27f67b.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-652247fbe7d62228.js",
+      "static/chunks/fd9d1056-307a36020502e7d7.js",
+      "static/chunks/117-c2e8725fecde5126.js",
+      "static/chunks/main-app-9d6f1a490c51b14a.js",
+      "static/chunks/358-254afb727acc2e17.js",
+      "static/chunks/app/page-86eb5bdbf3bbbfa9.js"
+    ],
+    "/reports/page": [
+      "static/chunks/webpack-652247fbe7d62228.js",
+      "static/chunks/fd9d1056-307a36020502e7d7.js",
+      "static/chunks/117-c2e8725fecde5126.js",
+      "static/chunks/main-app-9d6f1a490c51b14a.js",
+      "static/chunks/358-254afb727acc2e17.js",
+      "static/chunks/app/reports/page-1132c345fb333b3d.js"
+    ]
+  }
+}

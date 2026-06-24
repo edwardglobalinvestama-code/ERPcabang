@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Cabang (Branch) ──
+model Branch {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  code      String   @unique @db.VarChar(20)
+  address   String?  @db.Text
+  city      String?  @db.VarChar(100)
+  phone     String?  @db.VarChar(30)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  staff     Staff[]
+  kpiLogs   KpiLog[]
+  targets   KpiTarget[]
+}
+
+// ── Role (Jabatan) ──
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  slug        String   @unique @db.VarChar(30)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  staff       Staff[]
+  kpiTargets  KpiTarget[]
+  kpiLogs     KpiLog[]
+}
+
+// ── Staff ──
+model Staff {
+  id          Int           @id @default(autoincrement())
+  nip         String        @unique @db.VarChar(30)
+  name        String        @db.VarChar(100)
+  phone       String?       @db.VarChar(30)
+  email       String?       @db.VarChar(100)
+  pin         String        @db.VarChar(100) // bcrypt PIN
+  isActive    Boolean       @default(true)
+  branchId    Int
+  roleId      Int
+  joinDate    DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  branch      Branch        @relation(fields: [branchId], references: [id])
+  role        Role          @relation(fields: [roleId], references: [id])
+  kpiLogs     KpiLog[]
+  createdBy   Int?
+}
+
+// ── KPI Category ──
+model KpiCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  slug        String   @db.VarChar(30)
+  description String?  @db.Text
+  weight      Decimal  @default(1) @db.Decimal(5, 2) // weight for score calculation
+  createdAt   DateTime @default(now())
+
+  targets     KpiTarget[]
+  kpiLogs     KpiLog[]
+}
+
+// ── KPI Target (per role per category) ──
+model KpiTarget {
+  id          Int           @id @default(autoincrement())
+  roleId      Int
+  categoryId  Int
+  branchId    Int?
+  targetValue Decimal       @db.Decimal(12, 2)
+  targetDesc  String?       @db.Text
+  period      String        @db.VarChar(20) // daily, weekly, monthly
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  role        Role          @relation(fields: [roleId], references: [id])
+  category    KpiCategory   @relation(fields: [categoryId], references: [id])
+  branch      Branch?       @relation(fields: [branchId], references: [id])
+
+  @@unique([roleId, categoryId, branchId, period])
+}
+
+// ── KPI Log (actual achievement) ──
+model KpiLog {
+  id          Int           @id @default(autoincrement())
+  staffId     Int
+  categoryId  Int
+  branchId    Int
+  roleId      Int
+  value       Decimal       @db.Decimal(12, 2)
+  notes       String?       @db.Text
+  date        DateTime      @default(now())
+  period      String        @db.VarChar(20) // daily, weekly, monthly
+  approvedBy  Int?
+  isApproved  Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+
+  staff       Staff         @relation(fields: [staffId], references: [id])
+  category    KpiCategory   @relation(fields: [categoryId], references: [id])
+  branch      Branch        @relation(fields: [branchId], references: [id])
+  role        Role          @relation(fields: [roleId], references: [id])
+}
+
+// ── KPI Achievement Summary (materialized view / aggregated) ──
+model KpiSummary {
+  id          Int      @id @default(autoincrement())
+  staffId     Int
+  branchId    Int
+  roleId      Int
+  categoryId  Int
+  period      String   @db.VarChar(20)
+  periodStart DateTime
+  periodEnd   DateTime
+  targetValue Decimal  @db.Decimal(12, 2)
+  actualValue Decimal  @db.Decimal(12, 2)
+  score       Decimal  @db.Decimal(5, 2) // percentage 0-100
+  createdAt   DateTime @default(now())
+
+  @@unique([staffId, categoryId, period, periodStart])
+  @@index([branchId, roleId, period])
+}

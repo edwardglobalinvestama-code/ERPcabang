@@ -1,0 +1,16 @@
+[Unit]
+Description=Inusa Clinic ERP
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/inusa-clinic-erp
+ExecStart=/home/ubuntu/.local/bin/node /home/ubuntu/inusa-clinic-erp/.next/standalone/server.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PORT=3003
+
+[Install]
+WantedBy=multi-user.target

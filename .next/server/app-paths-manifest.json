@@ -1,0 +1,14 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/branches/route": "app/api/branches/route.js",
+  "/api/dashboard/route": "app/api/dashboard/route.js",
+  "/admin/page": "app/admin/page.js",
+  "/api/kpi/categories/route": "app/api/kpi/categories/route.js",
+  "/api/kpi/logs/route": "app/api/kpi/logs/route.js",
+  "/api/roles/route": "app/api/roles/route.js",
+  "/api/kpi/targets/route": "app/api/kpi/targets/route.js",
+  "/api/staff/route": "app/api/staff/route.js",
+  "/kpi/page": "app/kpi/page.js",
+  "/page": "app/page.js",
+  "/reports/page": "app/reports/page.js"
+}
