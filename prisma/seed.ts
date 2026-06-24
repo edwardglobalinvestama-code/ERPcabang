@@ -46,41 +46,64 @@ async function main() {
   ])
   console.log(`  ✓ Created ${roles.length} roles`)
 
-  // ── 3. KPI Categories (4 per role) ──
+  // ── 3. KPI Categories (expanded) ──
   const roleMap = Object.fromEntries(roles.map(r => [r.slug, r.id]))
 
   const categoryData = [
-    // Dokter
+    // Dokter (8 categories)
     { name: 'Jumlah Pasien', slug: 'jumlah-pasien', description: 'Total pasien ditangani', weight: 2.0, roleId: roleMap['dokter'] },
     { name: 'Kepuasan Pasien', slug: 'kepuasan-pasien', description: 'Tingkat kepuasan pasien', weight: 1.5, roleId: roleMap['dokter'] },
     { name: 'Ketepatan Diagnosis', slug: 'ketepatan-diagnosis', description: 'Akurasi diagnosis', weight: 2.0, roleId: roleMap['dokter'] },
     { name: 'Retensi Pasien', slug: 'retensi-pasien', description: 'Pasien kembali', weight: 1.0, roleId: roleMap['dokter'] },
-    // Branch Manager
+    { name: 'Upselling Produk', slug: 'upselling-dokter', description: 'Penjualan produk tambahan', weight: 1.5, roleId: roleMap['dokter'] },
+    { name: 'Target Sales', slug: 'target-sales-dokter', description: 'Pencapaian target penjualan', weight: 2.0, roleId: roleMap['dokter'] },
+    { name: 'Grooming & Penampilan', slug: 'grooming-dokter', description: 'Penampilan dan kerapihan', weight: 1.0, roleId: roleMap['dokter'] },
+    { name: 'Kehadiran Tepat Waktu', slug: 'kehadiran-dokter', description: 'Presensi dan ketepatan waktu', weight: 1.0, roleId: roleMap['dokter'] },
+    // Branch Manager (10 categories)
     { name: 'Target Pendapatan', slug: 'target-pendapatan', description: 'Pencapaian revenue', weight: 2.5, roleId: roleMap['branch-manager'] },
-    { name: 'Kepuasan Pelanggan', slug: 'kepuasan-pelanggan', description: 'Rating pelanggan', weight: 1.5, roleId: roleMap['branch-manager'] },
+    { name: 'Kepuasan Pelanggan', slug: 'kepuasan-pelanggan-bm', description: 'Rating pelanggan cabang', weight: 1.5, roleId: roleMap['branch-manager'] },
     { name: 'Produktivitas Staff', slug: 'produktivitas-staff', description: 'Efisiensi staff', weight: 1.5, roleId: roleMap['branch-manager'] },
     { name: 'Efisiensi Operasional', slug: 'efisiensi-operasional', description: 'Biaya operasional', weight: 1.0, roleId: roleMap['branch-manager'] },
-    { name: 'Pertumbuhan Cabang', slug: 'pertumbuhan-cabang', description: 'Growth bulanan', weight: 1.0, roleId: roleMap['branch-manager'] },
-    // Perawat
+    { name: 'Pertumbuhan Cabang', slug: 'pertumbuhan-cabang', description: 'Growth bulanan', weight: 1.5, roleId: roleMap['branch-manager'] },
+    { name: 'Pencarian Event', slug: 'pencarian-event', description: 'Event dan promosi', weight: 1.5, roleId: roleMap['branch-manager'] },
+    { name: 'Pencarian Influencer', slug: 'pencarian-influencer', description: 'Kerjasama influencer', weight: 1.5, roleId: roleMap['branch-manager'] },
+    { name: 'Upselling Cabang', slug: 'upselling-bm', description: 'Penjualan produk tambahan cabang', weight: 1.0, roleId: roleMap['branch-manager'] },
+    { name: 'Target Sales Cabang', slug: 'target-sales-bm', description: 'Target penjualan cabang', weight: 2.0, roleId: roleMap['branch-manager'] },
+    { name: 'Zero Complain', slug: 'zero-complain', description: 'Tidak ada komplain pelanggan', weight: 2.0, roleId: roleMap['branch-manager'] },
+    // Perawat (9 categories)
     { name: 'Jumlah Penanganan', slug: 'jumlah-penanganan', description: 'Pasien dirawat', weight: 1.5, roleId: roleMap['perawat'] },
     { name: 'Kepatuhan Prosedur', slug: 'kepatuhan-prosedur', description: 'SOP compliance', weight: 2.0, roleId: roleMap['perawat'] },
     { name: 'Kebersihan Ruangan', slug: 'kebersihan-ruangan', description: 'Kebersihan area kerja', weight: 1.0, roleId: roleMap['perawat'] },
     { name: 'Dokumentasi Medis', slug: 'dokumentasi-medis', description: 'Kelengkapan rekam medis', weight: 1.5, roleId: roleMap['perawat'] },
-    // Terapis
+    { name: 'Upselling Produk', slug: 'upselling-perawat', description: 'Penjualan produk tambahan', weight: 1.5, roleId: roleMap['perawat'] },
+    { name: 'Target Sales', slug: 'target-sales-perawat', description: 'Pencapaian target penjualan', weight: 1.5, roleId: roleMap['perawat'] },
+    { name: 'Kepuasan Pasien', slug: 'kepuasan-perawat', description: 'Feedback kepuasan pasien', weight: 1.5, roleId: roleMap['perawat'] },
+    { name: 'Produktivitas', slug: 'produktivitas-perawat', description: 'Produktivitas kerja', weight: 1.0, roleId: roleMap['perawat'] },
+    { name: 'Grooming & Penampilan', slug: 'grooming-perawat', description: 'Penampilan dan kerapihan', weight: 1.0, roleId: roleMap['perawat'] },
+    // Terapis (9 categories)
     { name: 'Jumlah Terapi', slug: 'jumlah-terapi', description: 'Sesi terapi dilakukan', weight: 1.5, roleId: roleMap['terapis'] },
-    { name: 'Kepuasan Klien', slug: 'kepuasan-klien', description: 'Feedback klien', weight: 1.5, roleId: roleMap['terapis'] },
-    { name: 'Upselling Produk', slug: 'upselling-produk', description: 'Penjualan produk tambahan', weight: 1.0, roleId: roleMap['terapis'] },
-    { name: 'Ketepatan Waktu', slug: 'kehadiran-tepat-waktu', description: 'Presensi & jadwal', weight: 1.0, roleId: roleMap['terapis'] },
-    // CS
+    { name: 'Kepatuhan Prosedur', slug: 'kepatuhan-prosedur-terapis', description: 'Kepatuhan SOP terapi', weight: 2.0, roleId: roleMap['terapis'] },
+    { name: 'Kebersihan Ruangan', slug: 'kebersihan-ruangan-terapis', description: 'Kebersihan area terapi', weight: 1.0, roleId: roleMap['terapis'] },
+    { name: 'Dokumentasi Treatment', slug: 'dokumentasi-terapis', description: 'Kelengkapan dokumentasi terapi', weight: 1.5, roleId: roleMap['terapis'] },
+    { name: 'Upselling Produk', slug: 'upselling-terapis', description: 'Penjualan produk tambahan', weight: 1.5, roleId: roleMap['terapis'] },
+    { name: 'Target Sales', slug: 'target-sales-terapis', description: 'Pencapaian target penjualan', weight: 1.5, roleId: roleMap['terapis'] },
+    { name: 'Kepuasan Klien', slug: 'kepuasan-terapis', description: 'Feedback kepuasan klien', weight: 1.5, roleId: roleMap['terapis'] },
+    { name: 'Produktivitas', slug: 'produktivitas-terapis', description: 'Produktivitas kerja', weight: 1.0, roleId: roleMap['terapis'] },
+    { name: 'Grooming & Penampilan', slug: 'grooming-terapis', description: 'Penampilan dan kerapihan', weight: 1.0, roleId: roleMap['terapis'] },
+    // CS (8 categories)
     { name: 'Jumlah Pendaftaran', slug: 'jumlah-pendaftaran', description: 'Pasien didaftarkan', weight: 1.5, roleId: roleMap['cs'] },
     { name: 'Waktu Pelayanan', slug: 'waktu-pelayanan', description: 'Kecepatan layanan', weight: 2.0, roleId: roleMap['cs'] },
-    { name: 'Kepuasan Pelanggan CS', slug: 'kepuasan-cs', description: 'Rating CS', weight: 1.5, roleId: roleMap['cs'] },
+    { name: 'Kepuasan Pelanggan', slug: 'kepuasan-cs', description: 'Rating CS', weight: 1.5, roleId: roleMap['cs'] },
     { name: 'Penanganan Keluhan', slug: 'penanganan-keluhan', description: 'Komplain terselesaikan', weight: 1.5, roleId: roleMap['cs'] },
-    // Apoteker
+    { name: 'Target Sales', slug: 'target-sales-cs', description: 'Pencapaian target penjualan', weight: 1.5, roleId: roleMap['cs'] },
+    { name: 'Upselling Produk', slug: 'upselling-cs', description: 'Penjualan produk tambahan', weight: 1.0, roleId: roleMap['cs'] },
+    { name: 'Zero Complain', slug: 'zero-complain-cs', description: 'Tidak ada komplain', weight: 2.0, roleId: roleMap['cs'] },
+    { name: 'Grooming & Penampilan', slug: 'grooming-cs', description: 'Penampilan dan kerapihan', weight: 1.0, roleId: roleMap['cs'] },
+    // Apoteker (4 categories)
     { name: 'Akurasi Resep', slug: 'akurasi-resep', description: 'Ketepatan peracikan', weight: 2.5, roleId: roleMap['apoteker'] },
     { name: 'Waktu Peracikan', slug: 'waktu-peracikan', description: 'Kecepatan meracik', weight: 1.5, roleId: roleMap['apoteker'] },
     { name: 'Manajemen Stok', slug: 'manajemen-stok', description: 'Akurasi stok obat', weight: 2.0, roleId: roleMap['apoteker'] },
-    { name: 'Kepatuhan Resep', slug: 'kepatuhan-resep', description: 'Verifikasi resep dokter', weight: 1.5, roleId: roleMap['apoteker'] },
+    { name: 'Kepatuhan Resep Dokter', slug: 'kepatuhan-resep', description: 'Verifikasi resep dokter', weight: 1.5, roleId: roleMap['apoteker'] },
   ]
 
   const categories: any[] = []
@@ -93,11 +116,11 @@ async function main() {
   // ── 4. KPI Targets ──
   const catRoleMap = new Map<string, number[]>()
   const targetValues: Record<string, Record<string, number>> = {
-    'dokter': { 'jumlah-pasien': 100, 'kepuasan-pasien': 90, 'ketepatan-diagnosis': 95, 'retensi-pasien': 70 },
-    'branch-manager': { 'target-pendapatan': 500000000, 'kepuasan-pelanggan': 90, 'produktivitas-staff': 85, 'efisiensi-operasional': 90, 'pertumbuhan-cabang': 10 },
-    'perawat': { 'jumlah-penanganan': 80, 'kepatuhan-prosedur': 95, 'kebersihan-ruangan': 95, 'dokumentasi-medis': 90 },
-    'terapis': { 'jumlah-terapi': 60, 'kepuasan-klien': 90, 'upselling-produk': 5000000, 'kehadiran-tepat-waktu': 95 },
-    'cs': { 'jumlah-pendaftaran': 150, 'waktu-pelayanan': 5, 'kepuasan-cs': 90, 'penanganan-keluhan': 100 },
+    'dokter': { 'jumlah-pasien': 100, 'kepuasan-pasien': 90, 'ketepatan-diagnosis': 95, 'retensi-pasien': 70, 'upselling-dokter': 5000000, 'target-sales-dokter': 30000000, 'grooming-dokter': 95, 'kehadiran-dokter': 98 },
+    'branch-manager': { 'target-pendapatan': 500000000, 'kepuasan-pelanggan-bm': 90, 'produktivitas-staff': 85, 'efisiensi-operasional': 90, 'pertumbuhan-cabang': 10, 'pencarian-event': 3, 'pencarian-influencer': 5, 'upselling-bm': 10000000, 'target-sales-bm': 100000000, 'zero-complain': 100 },
+    'perawat': { 'jumlah-penanganan': 80, 'kepatuhan-prosedur': 95, 'kebersihan-ruangan': 95, 'dokumentasi-medis': 90, 'upselling-perawat': 3000000, 'target-sales-perawat': 15000000, 'kepuasan-perawat': 90, 'produktivitas-perawat': 85, 'grooming-perawat': 95 },
+    'terapis': { 'jumlah-terapi': 60, 'kepatuhan-prosedur-terapis': 95, 'kebersihan-ruangan-terapis': 95, 'dokumentasi-terapis': 90, 'upselling-terapis': 5000000, 'target-sales-terapis': 20000000, 'kepuasan-terapis': 90, 'produktivitas-terapis': 85, 'grooming-terapis': 95 },
+    'cs': { 'jumlah-pendaftaran': 150, 'waktu-pelayanan': 5, 'kepuasan-cs': 90, 'penanganan-keluhan': 100, 'target-sales-cs': 10000000, 'upselling-cs': 3000000, 'zero-complain-cs': 100, 'grooming-cs': 95 },
     'apoteker': { 'akurasi-resep': 100, 'waktu-peracikan': 10, 'manajemen-stok': 95, 'kepatuhan-resep': 100 },
   }
 
@@ -124,11 +147,11 @@ async function main() {
   // ── 5. Staff (sample: 2 per role x 2 branches) ──
   const pinHash = bcrypt.hashSync('123456', 10)
   const sampleNames: Record<string, string[]> = {
-    'dokter': ['Dr. Andi', 'Dr. Siti'],
-    'branch-manager': ['Budi Santoso', 'Rina Wijaya'],
-    'perawat': ['Dewi Lestari', 'Ahmad Hidayat'],
-    'terapis': ['Maya Putri', 'Rudi Hermawan'],
-    'cs': ['Ani Susanti', 'Deni Pratama'],
+    'dokter': ['Dr. Andi', 'Dr. Siti', 'Dr. Rina'],
+    'branch-manager': ['Budi Santoso', 'Rina Wijaya', 'Agus Prasetyo'],
+    'perawat': ['Dewi Lestari', 'Ahmad Hidayat', 'Sari Dewi'],
+    'terapis': ['Maya Putri', 'Rudi Hermawan', 'Indah Permata'],
+    'cs': ['Ani Susanti', 'Deni Pratama', 'Fitriani'],
     'apoteker': ['Fitri Handayani', 'Irfan Maulana'],
   }
 
