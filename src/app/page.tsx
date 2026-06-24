@@ -1,14 +1,9 @@
 "use client"
 
-import React, { useState } from "react"
+import { useState, useEffect } from "react"
+import React from "react"
 import { Building2, Stethoscope, Activity, ArrowRight, Lock, Package } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-const branches = [
-  { id: 1, name: "Inusa Clinic Jakarta" },
-  { id: 2, name: "Inusa Clinic Bandung" },
-  { id: 3, name: "Inusa Clinic Surabaya" },
-]
 
 const roles = [
   { id: 1, name: "Dokter", slug: "dokter" },
@@ -20,13 +15,36 @@ const roles = [
   { id: 7, name: "Gudang", slug: "gudang" },
 ]
 
+const iconMap: Record<string, React.ReactNode> = {
+  "Dokter": <Stethoscope className="w-8 h-8 text-secondary" />,
+  "Branch Manager": <Building2 className="w-8 h-8 text-secondary" />,
+  "Perawat": <Activity className="w-8 h-8 text-accent" />,
+  "Terapis": <Activity className="w-8 h-8 text-accent" />,
+  "Customer Service": <Building2 className="w-8 h-8 text-secondary" />,
+  "Apoteker": <Stethoscope className="w-8 h-8 text-accent" />,
+  "Gudang": <Package className="w-8 h-8 text-secondary" />,
+}
+
 export default function LandingPage() {
+  const [branches, setBranches] = useState<Array<{ id: number; name: string }>>([])
   const [selectedBranch, setSelectedBranch] = useState("")
   const [selectedRole, setSelectedRole] = useState("")
   const [pin, setPin] = useState("")
   const [showLogin, setShowLogin] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [branchesLoaded, setBranchesLoaded] = useState(false)
+
+  // Fetch branches from API
+  useEffect(() => {
+    if (!branchesLoaded) {
+      setBranchesLoaded(true)
+      fetch("/api/branches")
+        .then(r => r.json())
+        .then(d => setBranches(Array.isArray(d) ? d : d.branches || []))
+        .catch(() => setBranches([]))
+    }
+  }, [branchesLoaded])
 
   const handleLogin = async () => {
     if (!selectedBranch || !selectedRole || !pin) {
@@ -42,13 +60,11 @@ export default function LandingPage() {
       const staff = data.staff?.[0]
 
       if (!staff) {
-        setError("Staff tidak ditemukan")
+        setError("Staff tidak ditemukan di cabang ini")
         setLoading(false)
         return
       }
 
-      // Simple PIN verification via bcrypt check on server
-      // For demo: any 6-digit PIN works
       if (pin.length < 4) {
         setError("PIN minimal 4 digit")
         setLoading(false)
@@ -59,7 +75,6 @@ export default function LandingPage() {
       sessionStorage.setItem("staff", JSON.stringify(staff))
       sessionStorage.setItem("role", JSON.stringify(role))
 
-      // Redirect based on role
       if (role?.slug === "branch-manager") {
         window.location.href = "/admin"
       } else {
@@ -72,16 +87,6 @@ export default function LandingPage() {
     }
   }
 
-  const iconMap: Record<string, React.ReactNode> = {
-    "Dokter": <Stethoscope className="w-8 h-8 text-secondary" />,
-    "Branch Manager": <Building2 className="w-8 h-8 text-secondary" />,
-    "Perawat": <Activity className="w-8 h-8 text-accent" />,
-    "Terapis": <Activity className="w-8 h-8 text-accent" />,
-    "Customer Service": <Building2 className="w-8 h-8 text-secondary" />,
-    "Apoteker": <Stethoscope className="w-8 h-8 text-accent" />,
-    "Gudang": <Package className="w-8 h-8 text-secondary" />,
-  }
-
   return (
     <main className="min-h-screen bg-surface flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -91,14 +96,14 @@ export default function LandingPage() {
             <Building2 className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">Inusa Clinic</h1>
-          <p className="text-white/60 mt-1">Operational Dashboard</p>
+          <p className="text-white/60 mt-1">Operational KPI Dashboard</p>
         </div>
 
         {/* Login Card */}
         <div className="bg-surface-light rounded-2xl p-6 border border-white/10 shadow-xl">
           {!showLogin ? (
             <>
-              <h2 className="text-lg font-semibold text-white mb-4">Pilih Peran Anda</h2>
+              <h2 className="text-lg font-semibold text-white mb-4">Pilih Role Anda</h2>
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {roles.map((role) => (
                   <button
@@ -139,7 +144,7 @@ export default function LandingPage() {
                   <select
                     value={selectedBranch}
                     onChange={(e) => setSelectedBranch(e.target.value)}
-                    className="select-field"
+                    className="input-field"
                   >
                     <option value="">Pilih Cabang</option>
                     {branches.map((b) => (
@@ -182,10 +187,9 @@ export default function LandingPage() {
             </>
           )}
 
-          {/* Info */}
           <div className="mt-6 pt-4 border-t border-white/10">
             <p className="text-white/40 text-xs text-center">
-              PIN default: 123456 • KPI Operational System v1.0
+              PIN default: 123456 • KPI v1.0
             </p>
           </div>
         </div>
