@@ -56,8 +56,21 @@ interface SummaryData {
 export default function ReportsPage() {
   // ── Auth ──
   const [loggedIn, setLoggedIn] = useState(false)
-  const [pin, setPin] = useState("")
-  const [loginError, setLoginError] = useState("")
+
+  // ── Check session on mount ──
+  useEffect(() => {
+    const stored = sessionStorage.getItem("staff")
+    const roleData = sessionStorage.getItem("role")
+    if (stored && roleData) {
+      try {
+        JSON.parse(stored)
+        JSON.parse(roleData)
+        setLoggedIn(true)
+      } catch {
+        // Invalid session
+      }
+    }
+  }, [])
 
   // ── Data ──
   const [branches, setBranches] = useState<Branch[]>([])
@@ -87,17 +100,6 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
   const [exportMsg, setExportMsg] = useState("")
-
-  // ── Login ──
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (pin === "123456" || pin.length >= 4) {
-      setLoggedIn(true)
-      setLoginError("")
-    } else {
-      setLoginError("PIN salah")
-    }
-  }
 
   // ── Load Data ──
   const loadData = async () => {
@@ -229,33 +231,9 @@ export default function ReportsPage() {
                 Masukkan PIN untuk mengakses laporan
               </p>
             </div>
-            {loginError && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg mb-4 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>{loginError}</span>
-              </div>
-            )}
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-300">PIN Akses</label>
-                <input
-                  type="password"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
-                  placeholder="· · · · · ·"
-                  className="input-field text-center text-lg tracking-[0.3em]"
-                  maxLength={6}
-                  inputMode="numeric"
-                  autoFocus
-                />
-              </div>
-              <button
-                type="submit"
-                className="btn-primary w-full py-2.5"
-              >
-                Masuk
-              </button>
-            </form>
+            <a href="/" className="btn-primary w-full inline-block text-center py-2.5">
+              Ke Halaman Login
+            </a>
           </div>
         </div>
       </div>

@@ -222,12 +222,19 @@ export default function KpiPage() {
     setLoginLoading(true)
     setLoginError("")
     try {
-      const res = await fetch("/api/auth/login", {
+      // Find the role ID from the slug
+      const matchedRole = roles.find(r => r.slug === roleSlug)
+      if (!matchedRole) {
+        setLoginError("Role tidak ditemukan")
+        setLoginLoading(false)
+        return
+      }
+      const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           branchId: Number(branchId),
-          roleSlug,
+          roleId: matchedRole.id,
           pin,
         }),
       })
@@ -238,7 +245,10 @@ export default function KpiPage() {
         return
       }
       const data = await res.json()
-      setStaff({ id: data.id, name: data.name, nip: data.nip })
+      const role = roles.find(r => r.id === matchedRole.id)
+      sessionStorage.setItem("staff", JSON.stringify(data.staff))
+      sessionStorage.setItem("role", JSON.stringify(role))
+      setStaff({ id: data.staff.id, name: data.staff.name, nip: data.staff.nip })
       setLoggedIn(true)
     } catch {
       setLoginError("Gagal terhubung ke server")
