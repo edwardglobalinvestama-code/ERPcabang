@@ -142,9 +142,7 @@ export default function KpiPage() {
   const [loginLoading, setLoginLoading] = useState(false)
 
   // KPI form
-  const [categories, setCategories] = useState<{ name: string; slug: string }[]>(
-    []
-  )
+  const [categories, setCategories] = useState<{ id: number; name: string; slug: string }[]>([])
   const [selectedCategory, setSelectedCategory] = useState("")
   const [kpiValue, setKpiValue] = useState("")
   const [notes, setNotes] = useState("")
@@ -183,15 +181,27 @@ export default function KpiPage() {
     loadInitial()
   }, [])
 
-  // Update categories when role changes
+  // Update categories when role changes — fetch from API
   useEffect(() => {
-    if (roleSlug && roleCategories[roleSlug]) {
-      setCategories(roleCategories[roleSlug])
-    } else {
-      setCategories([])
+    const loadCategories = async () => {
+      if (!loggedIn || !staff || !roleSlug) return
+      const matchedRole = roles.find(r => r.slug === roleSlug)
+      if (!matchedRole) return
+      try {
+        const res = await fetch(`/api/kpi/categories?roleId=${matchedRole.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          setCategories(Array.isArray(data) ? data.map((c: any) => ({ id: c.id, name: c.name, slug: c.slug })) : [])
+        }
+      } catch {
+        // fallback to hardcoded
+        const hardcoded = roleCategories[roleSlug] || []
+        setCategories(hardcoded.map((c, i) => ({ id: i + 1, name: c.name, slug: c.slug })))
+      }
     }
+    loadCategories()
     setSelectedCategory("")
-  }, [roleSlug])
+  }, [roleSlug, loggedIn, staff])
 
   // Load recent entries after login
   useEffect(() => {
@@ -199,7 +209,7 @@ export default function KpiPage() {
     const loadEntries = async () => {
       setEntriesLoading(true)
       try {
-        const res = await fetch(`/api/kpi?staffId=${staff.id}&limit=10`)
+        const res = await fetch(`/api/kpi/logs?staffId=${staff.id}&limit=10`)
         if (res.ok) {
           const data = await res.json()
           setRecentEntries(Array.isArray(data) ? data : data.data || [])
@@ -267,14 +277,27 @@ export default function KpiPage() {
     setSubmitError("")
     setSubmitSuccess("")
     try {
-      const res = await fetch("/api/kpi", {
+      // Find category from fetched/fallback list
+      const matchedCategory = categories.find(c => c.slug === selectedCategory)
+      if (!matchedCategory) {
+        setSubmitError("Kategori tidak ditemukan")
+        setSubmitting(false)
+        return
+      }
+      const matchedRole = roles.find(r => r.slug === roleSlug)
+      if (!matchedRole) {
+        setSubmitError("Role tidak ditemukan")
+        setSubmitting(false)
+        return
+      }
+      const res = await fetch("/api/kpi/logs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           staffId: staff!.id,
           branchId: Number(branchId),
-          roleSlug,
-          categorySlug: selectedCategory,
+          roleId: matchedRole.id,
+          categoryId: matchedCategory.id,
           value: Number(kpiValue),
           notes,
           date: kpiDate,
@@ -494,7 +517,7 @@ export default function KpiPage() {
                 >
                   <option value="">Pilih Kategori</option>
                   {categories.map((c) => (
-                    <option key={c.slug} value={c.slug}>
+                    <option key={c.id} value={c.slug}>
                       {c.name}
                     </option>
                   ))}
