@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Helper
+function getAuthStaff(request: NextRequest): { staffId: number; roleSlug: string } | null {
+  try {
+    const auth = request.headers.get('x-auth-staff')
+    if (!auth) return null
+    return JSON.parse(Buffer.from(auth, 'base64').toString())
+  } catch {
+    return null
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
+    const auth = getAuthStaff(request)
+    if (!auth) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(request.url)
     const branchId = searchParams.get('branchId')
     const roleId = searchParams.get('roleId')
