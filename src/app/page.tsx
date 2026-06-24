@@ -5,17 +5,7 @@ import React from "react"
 import { Building2, Stethoscope, Activity, ArrowRight, Lock, Package } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const roles = [
-  { id: 1, name: "Dokter", slug: "dokter" },
-  { id: 2, name: "Branch Manager", slug: "branch-manager" },
-  { id: 3, name: "Perawat", slug: "perawat" },
-  { id: 4, name: "Terapis", slug: "terapis" },
-  { id: 5, name: "Customer Service", slug: "cs" },
-  { id: 6, name: "Apoteker", slug: "apoteker" },
-  { id: 7, name: "Gudang", slug: "gudang" },
-]
-
-const iconMap: Record<string, React.ReactNode> = {
+const roleIcons: Record<string, React.ReactNode> = {
   "Dokter": <Stethoscope className="w-8 h-8 text-secondary" />,
   "Branch Manager": <Building2 className="w-8 h-8 text-secondary" />,
   "Perawat": <Activity className="w-8 h-8 text-accent" />,
@@ -27,52 +17,64 @@ const iconMap: Record<string, React.ReactNode> = {
 
 export default function LandingPage() {
   const [branches, setBranches] = useState<Array<{ id: number; name: string }>>([])
+  const [roles, setRoles] = useState<Array<{ id: number; name: string; slug: string }>>([])
   const [selectedBranch, setSelectedBranch] = useState("")
   const [selectedRole, setSelectedRole] = useState("")
   const [pin, setPin] = useState("")
   const [showLogin, setShowLogin] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [branchesLoaded, setBranchesLoaded] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
-  // Fetch branches from API
+  // Fetch branches and roles from API
   useEffect(() => {
-    if (!branchesLoaded) {
-      setBranchesLoaded(true)
-      fetch("/api/branches")
-        .then(r => r.json())
-        .then(d => setBranches(Array.isArray(d) ? d : d.branches || []))
-        .catch(() => setBranches([]))
+    if (!loaded) {
+      setLoaded(true)
+      Promise.all([
+        fetch("/api/branches").then(r => r.json()),
+        fetch("/api/roles").then(r => r.json()),
+      ]).then(([branchesData, rolesData]) => {
+        setBranches(Array.isArray(branchesData) ? branchesData : branchesData.branches || [])
+        setRoles(Array.isArray(rolesData) ? rolesData : rolesData.roles || [])
+      }).catch(() => {
+        setBranches([])
+        setRoles([])
+      })
     }
-  }, [branchesLoaded])
+  }, [loaded])
 
   const handleLogin = async () => {
     if (!selectedBranch || !selectedRole || !pin) {
       setError("Silakan pilih cabang, role, dan masukkan PIN")
       return
     }
+    if (pin.length < 4) {
+      setError("PIN minimal 4 digit")
+      return
+    }
     setLoading(true)
     setError("")
 
     try {
-      const res = await fetch(`/api/staff?branchId=${selectedBranch}&roleId=${selectedRole}`)
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          branchId: selectedBranch,
+          roleId: selectedRole,
+          pin,
+        }),
+      })
       const data = await res.json()
-      const staff = data.staff?.[0]
 
-      if (!staff) {
-        setError("Staff tidak ditemukan di cabang ini")
+      if (!res.ok) {
+        setError(data.error || "Gagal login, coba lagi")
         setLoading(false)
         return
       }
 
-      if (pin.length < 4) {
-        setError("PIN minimal 4 digit")
-        setLoading(false)
-        return
-      }
-
-      const role = roles.find(r => r.id === parseInt(selectedRole))
-      sessionStorage.setItem("staff", JSON.stringify(staff))
+      const role = roles.find(r => r.id.toString() === selectedRole)
+      sessionStorage.setItem("staff", JSON.stringify(data.staff))
       sessionStorage.setItem("role", JSON.stringify(role))
 
       if (role?.slug === "branch-manager") {
@@ -115,7 +117,7 @@ export default function LandingPage() {
                     className="flex flex-col items-center gap-2 p-4 rounded-xl bg-surface border border-white/10 hover:border-secondary/50 hover:bg-surface/80 transition-all duration-200 group"
                   >
                     <div className="w-10 h-10 rounded-lg bg-surface flex items-center justify-center group-hover:scale-110 transition-transform">
-                      {iconMap[role.name] || <Activity className="w-6 h-6 text-white/60" />}
+                      {roleIcons[role.name] || <Activity className="w-6 h-6 text-white/60" />}
                     </div>
                     <span className="text-sm text-white/80 group-hover:text-white transition-colors text-center">
                       {role.name}
