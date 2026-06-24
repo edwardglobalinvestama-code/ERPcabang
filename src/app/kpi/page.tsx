@@ -127,16 +127,6 @@ const roleCategories: Record<string, { name: string; slug: string }[]> = {
     { name: 'Pemeliharaan Kendaraan', slug: 'pemeliharaan-kendaraan' },
     { name: 'Kebersihan & Kerapian Gudang', slug: 'kebersihan-gudang' },
   ],
-  coach: [
-    { name: 'Jumlah Member Aktif', slug: 'jumlah-member-aktif' },
-    { name: 'Retensi Member', slug: 'retensi-member' },
-    { name: 'Sesi Personal Training', slug: 'sesi-personal-training' },
-    { name: 'Kebersihan & Perawatan Alat', slug: 'kebersihan-alat-gym' },
-    { name: 'Kepuasan Member', slug: 'kepuasan-member' },
-    { name: 'Akuisisi Member Baru', slug: 'akuisisi-member-baru' },
-    { name: 'Target Revenue', slug: 'target-revenue-gym' },
-    { name: 'Upselling Paket', slug: 'upselling-paket-gym' },
-  ],
 }
 
 export default function KpiPage() {
