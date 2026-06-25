@@ -5,7 +5,12 @@ function getAuthStaff(request: NextRequest): { staffId: number; roleSlug: string
   try {
     const auth = request.headers.get('x-auth-staff')
     if (!auth) return null
-    return JSON.parse(Buffer.from(auth, 'base64').toString())
+    const decoded = JSON.parse(Buffer.from(auth, 'base64').toString())
+    // Handle superadmin session format: { role: 'superadmin', ... }
+    if (decoded.role === 'superadmin') {
+      return { staffId: 0, roleSlug: 'superadmin' }
+    }
+    return decoded
   } catch {
     return null
   }

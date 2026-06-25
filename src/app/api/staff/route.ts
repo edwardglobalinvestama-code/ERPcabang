@@ -7,7 +7,12 @@ function getAuthStaff(request: NextRequest): { staffId: number; roleSlug: string
   try {
     const auth = request.headers.get('x-auth-staff')
     if (!auth) return null
-    return JSON.parse(Buffer.from(auth, 'base64').toString())
+    const decoded = JSON.parse(Buffer.from(auth, 'base64').toString())
+    // Handle superadmin session format: { role: 'superadmin', ... }
+    if (decoded.role === 'superadmin') {
+      return { staffId: 0, roleSlug: 'superadmin' }
+    }
+    return decoded
   } catch {
     return null
   }
@@ -23,13 +28,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const branchId = searchParams.get('branchId')
     const roleId = searchParams.get('roleId')
-    // Only BM can see all staff; others see their own branch only
+    // Only BM and SuperAdmin can see all staff; others see their own branch only
     const isBM = auth.roleSlug === 'branch-manager'
+    const isSuperAdmin = auth.roleSlug === 'superadmin'
 
     const where: Record<string, unknown> = {}
     if (branchId) where.branchId = Number(branchId)
-    else if (!isBM) {
-      // Non-BM can only see their own branch
+    else if (!isBM && !isSuperAdmin) {
+      // Non-BM and non-SA can only see their own branch
       const staff = await prisma.staff.findUnique({ where: { id: auth.staffId }, select: { branchId: true } })
       if (staff) where.branchId = staff.branchId
     }
@@ -61,8 +67,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const auth = getAuthStaff(request)
-    if (!auth || auth.roleSlug !== 'branch-manager') {
-      return NextResponse.json({ error: 'Forbidden — only Branch Manager can create staff' }, { status: 403 })
+    if (!auth || (auth.roleSlug !== 'branch-manager' && auth.roleSlug !== 'superadmin')) {
+      return NextResponse.json({ error: 'Forbidden — only Branch Manager or Super Admin can create staff' }, { status: 403 })
     }
 
     const body = await request.json()
